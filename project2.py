@@ -118,13 +118,15 @@ def corners_unwarp(img, nx, ny, mtx, dist):
     img_size = (img.shape[1], img.shape[0])
 
     # For source points I'm grabbing the outer four detected corners
-    #src = np.float32([[250,683],[500,510], [766,510], [1042,683]])
-    src = np.float32([[250,683],[350,608], [920,608], [1042,683]])
+    src = np.float32([[250,683],[559,472], [724,472], [1042,683]])
+    #src = np.float32([[250,683],[350,608], [920,608], [1042,683]])
+    #src = np.float32([[250,683],[600,440], [670,440], [1042,683]])
     # For destination points, I'm arbitrarily choosing some points to be
     # a nice fit for displaying our warped result 
     # again, not exact, but close enough for our purposes
     #dst = np.float32([[250,683], [250,510], [1042,510], [1042,683]])
-    dst = np.float32([[250,683], [250,608], [1042,608], [1042,683]])
+    #dst = np.float32([[250,683], [250,608], [1042,608], [1042,683]])
+    dst = np.float32([[250,683], [250,0], [1042,0], [1042,683]])
     # Given src and dst points, calculate the perspective transform matrix
     M = cv2.getPerspectiveTransform(src, dst)
     # Warp the image using OpenCV warpPerspective()
@@ -138,10 +140,10 @@ img = cv2.imread('./test_images/straight_lines1.jpg')
 img_size = (img.shape[1], img.shape[0])
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size,None,None)
 col_grad = color_and_gradient(img)
-warped1,perspective_M  = corners_unwarp(col_grad, nx, ny, mtx, dist)
+warped1,perspective_M  = corners_unwarp(img, nx, ny, mtx, dist)
 
-img = cv2.imread('./test_images/straight_lines2.jpg')
-warped,perspective_M  = corners_unwarp(col_grad, nx, ny, mtx, dist)
+img = cv2.imread('./test_images/straight_lines1.jpg')
+#warped,perspective_M  = corners_unwarp(col_grad, nx, ny, mtx, dist)
 
 result = warped1
 # use (arr, cmap='gray') option when you want to show a grey scale image 
