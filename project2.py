@@ -34,27 +34,11 @@ def find_camera_params():
         if ret == True:
             imgpoints.append(corners)
             objpoints.append(objp)
-    
-def get_pers_trans_matrix(img,corners):
-    #get perspective transform matrix
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_size = (gray.shape[1], gray.shape[0])
-    offset = 100
-    src = np.float32([corners[0], corners[nx-1], corners[-1], corners[-nx]])
-    dst = np.float32([[offset,offset], [img_size[0]-offset,offset], [img_size[0]-offset, img_size[1]-offset], [offset, img_size[1]-offset]])
-    M = cv2.getPerspectiveTransform(src,dst)
-    
-    return M
-    
 
 #function that takes an image, object points, and image points
 # performs the camera calibration, image distortion correction and 
 # returns the undistorted image
 def cal_undistort(img, objpoints, imgpoints):
-    # Use cv2.calibrateCamera() and cv2.undistort()
-    
-    
-    
     undist = cv2.undistort(img, mtx, dist, None, mtx)
     return undist
     
@@ -83,6 +67,9 @@ def color_and_gradient(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     # Combine the two binary thresholds
     combined_binary = np.zeros_like(sxbinary)
     combined_binary[(s_binary == 1) | (sxbinary == 1)] = 1
+    #combined_binary[(s_binary == 1) & (sxbinary == 1)] = 1
+    #return combined_binary
+    #return s_binary
     return combined_binary
 
 def get_vertices(image):
@@ -123,34 +110,7 @@ def region_of_interest(img, vertices):
     #returning the image only where mask pixels are nonzero
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
-
-def canny(img, low_threshold, high_threshold):
-    """Applies the Canny transform"""
-    return cv2.Canny(img, low_threshold, high_threshold)    
-    
-def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
-    """
-    This function draws `lines` with `color` and `thickness`.    
-    Lines are drawn on the image inplace (mutates the image).
-    If you want to make the lines semi-transparent, think about combining
-    this function with the weighted_img() function below
-    """
-    for line in lines:
-        for x1,y1,x2,y2 in line:
-            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
-
-def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
-    """
-    `img` should be the output of a Canny transform.
-        
-    Returns an image with hough lines drawn.
-    """
-    lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
-    line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
-    return line_img 
-    
-
+   
 def corners_unwarp(img, nx, ny, mtx, dist):
     # Use the OpenCV undistort() function to remove distortion
     undist = cv2.undistort(img, mtx, dist, None, mtx)
@@ -185,33 +145,14 @@ def corners_unwarp(img, nx, ny, mtx, dist):
     # Return the resulting image and matrix
     return warped, M
 
-img = cv2.imread('./camera_cal/calibration3.jpg')
-img_size = (img.shape[1], img.shape[0])
 find_camera_params()
+img = cv2.imread('./test_images/straight_lines1.jpg')
+img_size = (img.shape[1], img.shape[0])
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size,None,None)
-warped,perspective_M  = corners_unwarp(img, nx, ny, mtx, dist)
+col_grad = color_and_gradient(img)
+#warped,perspective_M  = corners_unwarp(col_grad, nx, ny, mtx, dist)
 
-img = cv2.imread('./test_images/straight_lines1.jpg')
-img_size = (img.shape[1], img.shape[0])
-undist = cv2.undistort(img, mtx, dist, None, mtx)
-warped2 = cv2.warpPerspective(undist, perspective_M, img_size,flags=cv2.INTER_LINEAR)
-
-"""
-img = cv2.imread('./test_images/straight_lines1.jpg')
-img_size = (img.shape[1], img.shape[0])
-undist = cv2.undistort(img, mtx, dist, None, mtx)
-col_grad = color_and_gradient(undist)
-warped = cv2.warpPerspective(col_grad, perspective_M, img.shape[::-1],flags=cv2.INTER_LINEAR)
-"""
-"""
-# get the vertices for the ROI
-vertices = get_vertices(col_grad)
-print(vertices)
-
-masked_image = region_of_interest(col_grad,vertices)
-"""
-
-result = warped2
+result = col_grad
 # use (arr, cmap='gray') option when you want to show a grey scale image 
 plt.imshow(result, cmap='gray')
 plt.show()
