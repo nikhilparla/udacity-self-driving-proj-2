@@ -135,17 +135,29 @@ def corners_unwarp(img, nx, ny, mtx, dist):
     # Return the resulting image and matrix
     return warped, M
 
+def hist(img):
+    # TO-DO: Grab only the bottom half of the image
+    # Lane lines are likely to be mostly vertical nearest to the car
+    bottom_half = img[img.shape[0]//2:,:]
+    
+    # TO-DO: Sum across image pixels vertically - make sure to set `axis`
+    # i.e. the highest areas of vertical lines should be larger values
+    histogram = np.sum(bottom_half,axis=0)
+    
+    return histogram	
+	
 find_camera_params()
 img = cv2.imread('./test_images/straight_lines1.jpg')
 img_size = (img.shape[1], img.shape[0])
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size,None,None)
 col_grad = color_and_gradient(img)
 warped1,perspective_M  = corners_unwarp(img, nx, ny, mtx, dist)
+histogram = hist(warped1)
 
 img = cv2.imread('./test_images/straight_lines1.jpg')
 #warped,perspective_M  = corners_unwarp(col_grad, nx, ny, mtx, dist)
 
-result = warped1
+result = histogram
 # use (arr, cmap='gray') option when you want to show a grey scale image 
 plt.imshow(result, cmap='gray')
 plt.show()
