@@ -34,6 +34,11 @@ The python notebook in the repo has all the necessary documentation and comments
  - fill the ploygon area for visualization
  - ![chessboard_corners](./images/unwrap_draw.png)
 
+*add pipeline*
+ - Complete the pipeline 
+ - Output of pipeline in the ./output_images folder
+ - Video uploaded onto imgur
+
 ### Output Notes
 *Project video output* :https://imgur.com/a/AgkYAH3
 * The pipeline runs smoothly on this road even on the parts where there is a bridge (sharp change of color and contrast with the lane lines). A clear marking of the lanes is very helpful and also the fact that there are no sharp turns. It also tracks the roads where there are sharp shadows from the trees and objects nearby
